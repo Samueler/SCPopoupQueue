@@ -9,15 +9,17 @@
 #import "SCPopupQueue.h"
 #import "SCPopupQueueTool.h"
 
-static SCPopupQueue *instance =  nil;
+static SCPopupQueue *instance = nil;
 
 @interface SCPopupQueue () <
 NSCopying,
 NSMutableCopying,
-SCPopupUnitDelegate
+SCPopupRequestDelegate
 >
 
 @property (nonatomic, strong) NSMutableArray<SCPopupUnit *> *internalUnits;
+
+@property (nonatomic, strong) NSMutableArray *relyedOnUnits;
 
 @end
 
@@ -31,38 +33,100 @@ SCPopupUnitDelegate
 
 - (void)showPopupUnits {
     SCPopupUnit *currentUnit = self.internalUnits.firstObject;
-    currentUnit.delegate = self;
     if (!currentUnit) {
         return;
     }
     
-    BOOL canShow = currentUnit.popupUnitItem.popup.currentState == SCPopupStateIdle;
-    BOOL onTargetClass = [SCPopupQueueTool.topViewController isKindOfClass:currentUnit.showOnClass];
-    canShow = canShow && onTargetClass;
-    
-    if (currentUnit.showCondition) {
-        canShow = canShow && currentUnit.showCondition();
-    }
-    
-    BOOL result = currentUnit.showConditionRelyOnNet(currentUnit.netData);
-    if (!result) {
+    if (currentUnit.relyedOnUnit && !currentUnit.relyedOnUnit.request.popupRequestFinish) {
         return;
     }
-    canShow = canShow && result;
     
-    if (canShow) {
-        [currentUnit.popupUnitItem.popup showPopup];
-    } else {
-        [self.internalUnits removeObject:currentUnit];
+    if (currentUnit.request) {
+        currentUnit.request.delegate = self;
+        if (!currentUnit.async) {
+            currentUnit.request.prepare = YES;
+        }
         
-        [self showPopupUnits];
+        if (!currentUnit.request.popupRequestFinish) {
+            return;
+        }
+        
+        if (currentUnit.request.requestTimeout) {
+            [self deletePopUnit:currentUnit];
+            
+            [self showPopupUnits];
+            return;
+        }
+        
+        if (currentUnit.request.popupShowCondition) {
+            BOOL conditionCorrect = currentUnit.request.popupShowCondition(currentUnit.request.popupData);
+            if (!conditionCorrect) {
+                [self deletePopUnit:currentUnit];
+                [self showPopupUnits];
+                return;
+            }
+        }
     }
+    
+    __weak typeof(currentUnit) weakCurrentUnit = currentUnit;
+    currentUnit.popup.popupStateChanged = ^(SCPopupState state) {
+        if (state == SCPopupStateDismiss) {
+            [self deletePopUnit:weakCurrentUnit];
+            [self showPopupUnits];
+        }
+    };
+    
+    SCPopupState popupCurrentState = currentUnit.popup.currentState;
+    
+    BOOL stateCorrect = (popupCurrentState == SCPopupStateIdle) || (popupCurrentState == SCPopupStateDismiss);
+    if (!stateCorrect) {
+        return;
+    }
+    
+    BOOL onTargetClass = [SCPopupQueueTool.rootNavigationController.topViewController isEqual:currentUnit.showOnInstance];
+    if (!onTargetClass) {
+        return;
+    }
+    
+    if ([currentUnit.popup isKindOfClass:[UIView class]]) {
+        UIView *popupView = (UIView *)currentUnit.popup;
+        if ([currentUnit.showOnInstance isKindOfClass:[UIView class]]) {
+            UIView *showOnView = (UIView *)currentUnit.showOnInstance;
+            [showOnView addSubview:(UIView *)currentUnit.popup];
+            if (CGRectEqualToRect(popupView.frame, CGRectZero)) {
+                popupView.frame = showOnView.bounds;
+            }
+        } else if ([currentUnit.showOnInstance isKindOfClass:[UIViewController class]]) {
+            UIViewController *showOnVC = (UIViewController *)currentUnit.showOnInstance;
+            [showOnVC.view addSubview:(UIView *)currentUnit.popup];
+            if (CGRectEqualToRect(popupView.frame, CGRectZero)) {
+                popupView.frame = showOnVC.view.bounds;
+            }
+        }
+    } else if ([currentUnit.popup isKindOfClass:[UIViewController class]]) {
+        UIViewController *popupVC = (UIViewController *)currentUnit.popup;
+        if ([currentUnit.showOnInstance isKindOfClass:[UIView class]]) {
+            UIView *showOnView = (UIView *)currentUnit.showOnInstance;
+            [showOnView addSubview:popupVC.view];
+            popupVC.view.frame = showOnView.bounds;
+        } else if ([currentUnit.showOnInstance isKindOfClass:[UIViewController class]]) {
+            if (!SCPopupQueueTool.rootNavigationController) {
+                return;
+            }
+            
+            [SCPopupQueueTool.rootNavigationController presentViewController:popupVC animated:YES completion:nil];
+        }
+    }
+    [currentUnit.popup showPopup];
 }
 
-- (void)popupUnitNetFinish:(SCPopupUnit *)unit {
-    if ([self.internalUnits.firstObject isEqual:unit]) {
-        [self showPopupUnits];
-    }
+
+- (void)deleteAllPopupUnits {
+    [self.internalUnits enumerateObjectsUsingBlock:^(SCPopupUnit *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        obj.request.delegate = nil;
+    }];
+    
+    [self.internalUnits removeAllObjects];
 }
 
 #pragma mark - Private Functions
@@ -75,6 +139,23 @@ SCPopupUnitDelegate
             return NSOrderedDescending;
         }
     }];
+}
+
+- (void)deletePopUnit:(SCPopupUnit *)unit {
+    if (![self.internalUnits containsObject:unit]) {
+        return;
+    }
+    
+    unit.request.delegate = nil;
+    [self.internalUnits removeObject:unit];
+}
+
+#pragma mark - SCPopupRequestDelegate
+
+- (void)popupRequest:(SCPopupRequest *)request finished:(BOOL)finished {
+    if ([self.internalUnits.firstObject.request isEqual:request] && finished) {
+        [self showPopupUnits];
+    }
 }
 
 #pragma mark - Singleton

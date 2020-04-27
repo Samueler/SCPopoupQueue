@@ -7,49 +7,48 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SCPopupUnitItem.h"
 #import "SCPopupProtocol.h"
-#import "SCPopupUnitRequest.h"
-
-@class SCPopupUnit;
-
-@protocol SCPopupUnitDelegate <NSObject>
-
-@optional
-
-- (void)popupUnitNetFinish:(SCPopupUnit *)unit;
-
-@end
+#import "SCPopupRequest.h"
 
 @interface SCPopupUnit : NSObject
 
 @property (nonatomic, strong, readonly) id<SCPopupProtocol> popup;
 
-/// 显示的优先级
 @property (nonatomic, assign, readonly) NSUInteger popupPriority;
 
-/// 在哪个界面显示
-@property (nonatomic, strong, readonly) Class showOnClass;
+@property (nonatomic, strong, readonly) id showOnInstance;
 
-@property (nonatomic, strong, readonly) SCPopupUnitItem *popupUnitItem;
+@property (nonatomic, strong, readonly) SCPopupRequest *request;
 
-@property (nonatomic, copy) dispatch_block_t request;
+@property (nonatomic, assign, readonly, getter=isAsync) BOOL async;
 
-@property (nonatomic, strong) id netData;
-
-@property (nonatomic, copy) BOOL(^showCondition) (void);
-
-@property (nonatomic, copy) BOOL(^showConditionRelyOnNet) (id data);
-
-@property (nonatomic, assign) BOOL finish;
-
-@property (nonatomic, weak) id<SCPopupUnitDelegate> delegate;
+@property (nonatomic, strong, readonly) SCPopupUnit *relyedOnUnit;
 
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
 - (instancetype)initWithPopup:(id<SCPopupProtocol>)popup
-popupPriority:(NSUInteger)popupPriority
-                  showOnClass:(Class)showOnClass;
+                popupPriority:(NSUInteger)popupPriority
+                  showOnInstance:(id)showOnInstance;
+
+- (instancetype)initWithPopup:(id<SCPopupProtocol>)popup
+                popupPriority:(NSUInteger)popupPriority
+                  showOnInstance:(Class)showOnClass
+                        async:(BOOL)async;
+
+- (instancetype)initWithRequest:(SCPopupRequest *)request
+                          popup:(id<SCPopupProtocol>)popup
+                  popupPriority:(NSUInteger)popupPriority
+                    showOnInstance:(id)showOnInstance;
+
+- (instancetype)initWithRequest:(SCPopupRequest *)request
+                          popup:(id<SCPopupProtocol>)popup
+                  popupPriority:(NSUInteger)popupPriority
+                    showOnInstance:(id)showOnInstance
+                          async:(BOOL)async;
+
+- (void)relyOn:(SCPopupUnit *)unit;
+
+- (void)deleteRelyOn:(SCPopupUnit *)unit;
 
 @end

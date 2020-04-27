@@ -10,20 +10,17 @@
 
 @implementation SCPopupQueueTool
 
-+ (UIViewController *)topViewController {
-    return [self rootNavigationController].topViewController;
-}
-
 + (UINavigationController *)rootNavigationController {
-    UIViewController *rootViewController = [[[UIApplication sharedApplication] keyWindow] rootViewController];
-    if ([rootViewController isKindOfClass:[UITabBarController class]]) {
-        UITabBarController *tabBarVC = (UITabBarController *)rootViewController;
-        UINavigationController *navigationController = (UINavigationController *)tabBarVC.selectedViewController;
-        return navigationController;
-    } else if ([rootViewController isKindOfClass:[UINavigationController class]]) {
-        return (UINavigationController *)rootViewController;
+    UIViewController *rootVC = [[[UIApplication sharedApplication] keyWindow] rootViewController];
+    
+    if ([rootVC isKindOfClass:[UITabBarController class]]) {
+        UITabBarController *tabBarVC = (UITabBarController *)rootVC;
+        UINavigationController *navc = (UINavigationController *)tabBarVC.selectedViewController;
+        return navc;
+    } else if ([rootVC isKindOfClass:[UINavigationController class]]) {
+        return (UINavigationController *)rootVC;
     } else {
-        return rootViewController.navigationController;
+        return rootVC.navigationController;
     }
 }
 

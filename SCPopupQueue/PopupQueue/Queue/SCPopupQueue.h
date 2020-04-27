@@ -19,4 +19,6 @@
 
 - (void)showPopupUnits;
 
+- (void)deleteAllPopupUnits;
+
 @end

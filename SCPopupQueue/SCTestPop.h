@@ -6,9 +6,10 @@
 //  Copyright © 2020 妈妈网. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
-#import "SCPopupProtocol.h"
+#import "SCPopup.h"
 
-@interface SCTestPop : UIView <SCPopupProtocol>
+@interface SCTestPop : SCPopup
+
+@property (nonatomic, copy) NSString *text;
 
 @end

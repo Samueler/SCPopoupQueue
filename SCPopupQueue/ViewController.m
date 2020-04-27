@@ -9,7 +9,6 @@
 #import "ViewController.h"
 #import "SCPopupQueue.h"
 #import "SCTestPop.h"
-#import "SCPopupUnitRequest.h"
 
 @interface ViewController ()
 
@@ -22,26 +21,34 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    SCTestPop *pop =nil;
-
+    SCTestPop *pop1 = [[SCTestPop alloc] init];
+    pop1.text = @"第一个pop";
     
-    SCPopupUnit *unit = [[SCPopupUnit alloc] initWithPopup:pop popupPriority:3 showOnClass:self.class];
-    __weak typeof(unit) weakUnit = unit;
-    unit.request = ^{
-        __strong typeof(weakUnit) strongSelf = weakUnit;
+    SCPopupUnit *unit1 = [[SCPopupUnit alloc] initWithPopup:pop1 popupPriority:4 showOnInstance:self];
+    
+    [SCPopupQueue.shareInstance addPopupUnit:unit1];
+    
+    SCTestPop *pop2 = [[SCTestPop alloc] init];
+    pop2.text = @"第二个pop";
+    
+    SCPopupRequest *request = [[SCPopupRequest alloc] init];
+    __weak typeof(request) weakRequest = request;
+    request.popupRequest = ^{
+        dispatch_async(dispatch_get_global_queue(0, 0), ^{
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    strongSelf.netData = @"xxx";
-                    strongSelf.finish = YES;
-                });
+                weakRequest.popupRequestFinish = YES;
+                weakRequest.popupData = @"123";
             });
+        });
     };
     
-    unit.showConditionRelyOnNet = ^BOOL(NSString *data) {
-        return data.length;
+    request.popupShowCondition = ^BOOL(id popupData) {
+      return YES;
     };
     
-    [SCPopupQueue.shareInstance addPopupUnit:unit];
+    SCPopupUnit *unit2 = [[SCPopupUnit alloc] initWithRequest:request popup:pop2 popupPriority:5 showOnInstance:self];
+    
+    [SCPopupQueue.shareInstance addPopupUnit:unit2];
     
     [SCPopupQueue.shareInstance showPopupUnits];
     

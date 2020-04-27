@@ -11,6 +11,6 @@
 
 @interface SCPopupQueueTool : NSObject
 
-+ (UIViewController *)topViewController;
++ (UINavigationController *)rootNavigationController;
 
 @end

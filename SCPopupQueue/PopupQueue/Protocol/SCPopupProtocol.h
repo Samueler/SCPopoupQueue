@@ -7,24 +7,26 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 typedef NS_ENUM(NSUInteger, SCPopupState) {
     SCPopupStateIdle,
     SCPopupStateShowing,
-    SCPopupStateDismiss,
-    SCPopupStateDestoryed
+    SCPopupStateDismiss
 };
 
 @protocol SCPopupProtocol <NSObject>
 
 @property (nonatomic, assign, readonly) SCPopupState currentState;
 
-@optional
+@property (nonatomic, copy) void(^popupStateChanged) (SCPopupState state);
 
 - (void)showPopup;
 
 - (void)dismissPopup;
 
-- (void)destoryPopup;
+- (UIView *)popupContentView;
+
+- (CGSize)popupContentSize;
 
 @end
