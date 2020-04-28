@@ -16,30 +16,27 @@
 
 @implementation SCTestPop
 
-- (instancetype)initWithFrame:(CGRect)frame {
-    if (self = [super initWithFrame:frame]) {
-        self.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
-        
-        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(10, 100, 300, 100)];
-        label.textColor = [UIColor whiteColor];
-        [self addSubview:label];
-        self.label = label;
-    }
-    return self;
-}
-
 - (void)setText:(NSString *)text {
     _text = text;
     self.label.text = text;
 }
 
-- (void)showPopup {
-    [super showPopup];
-    NSLog(@"showPopup");
+- (UIView *)popupContentView {
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self dismissPopup];
-    });
+    UIView *white = [[UIView alloc] init];
+    white.backgroundColor = [UIColor whiteColor];
+    
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+    label.backgroundColor = [UIColor orangeColor];
+    label.textColor = [UIColor redColor];
+    [white addSubview:label];
+    self.label = label;
+    
+    return white;
+}
+
+- (CGSize)popupContentSize {
+    return CGSizeMake(300, 100);
 }
 
 @end

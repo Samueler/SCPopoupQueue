@@ -21,16 +21,18 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    SCTestPop *pop1 = [[SCTestPop alloc] init];
+    self.view.backgroundColor = [UIColor whiteColor];
+    
+    SCTestPop *pop1 = [SCTestPop popupWithTouchDismiss:YES];
     pop1.text = @"第一个pop";
     
     SCPopupUnit *unit1 = [[SCPopupUnit alloc] initWithPopup:pop1 popupPriority:4 showOnInstance:self];
-    
+
     [SCPopupQueue.shareInstance addPopupUnit:unit1];
-    
-    SCTestPop *pop2 = [[SCTestPop alloc] init];
+
+    SCTestPop *pop2 = [SCTestPop popupWithTargetView:nil maskColor:nil bounces:NO touchDismiss:YES];;
     pop2.text = @"第二个pop";
-    
+
     SCPopupRequest *request = [[SCPopupRequest alloc] init];
     __weak typeof(request) weakRequest = request;
     request.popupRequest = ^{
@@ -41,15 +43,15 @@
             });
         });
     };
-    
+
     request.popupShowCondition = ^BOOL(id popupData) {
       return YES;
     };
-    
+
     SCPopupUnit *unit2 = [[SCPopupUnit alloc] initWithRequest:request popup:pop2 popupPriority:5 showOnInstance:self];
-    
+
     [SCPopupQueue.shareInstance addPopupUnit:unit2];
-    
+
     [SCPopupQueue.shareInstance showPopupUnits];
     
 }

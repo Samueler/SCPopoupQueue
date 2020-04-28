@@ -12,7 +12,7 @@
 
 @interface SCPopupUnit : NSObject
 
-@property (nonatomic, strong, readonly) id<SCPopupProtocol> popup;
+@property (nonatomic, strong, readonly) UIView<SCPopupProtocol> *popup;
 
 @property (nonatomic, assign, readonly) NSUInteger popupPriority;
 
@@ -27,22 +27,22 @@
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initWithPopup:(id<SCPopupProtocol>)popup
+- (instancetype)initWithPopup:(UIView<SCPopupProtocol> *)popup
                 popupPriority:(NSUInteger)popupPriority
                   showOnInstance:(id)showOnInstance;
 
-- (instancetype)initWithPopup:(id<SCPopupProtocol>)popup
+- (instancetype)initWithPopup:(UIView<SCPopupProtocol> *)popup
                 popupPriority:(NSUInteger)popupPriority
                   showOnInstance:(Class)showOnClass
                         async:(BOOL)async;
 
 - (instancetype)initWithRequest:(SCPopupRequest *)request
-                          popup:(id<SCPopupProtocol>)popup
+                          popup:(UIView<SCPopupProtocol> *)popup
                   popupPriority:(NSUInteger)popupPriority
                     showOnInstance:(id)showOnInstance;
 
 - (instancetype)initWithRequest:(SCPopupRequest *)request
-                          popup:(id<SCPopupProtocol>)popup
+                          popup:(UIView<SCPopupProtocol> *)popup
                   popupPriority:(NSUInteger)popupPriority
                     showOnInstance:(id)showOnInstance
                           async:(BOOL)async;

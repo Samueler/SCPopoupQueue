@@ -88,38 +88,10 @@ SCPopupRequestDelegate
         return;
     }
     
-    if ([currentUnit.popup isKindOfClass:[UIView class]]) {
-        UIView *popupView = (UIView *)currentUnit.popup;
-        if ([currentUnit.showOnInstance isKindOfClass:[UIView class]]) {
-            UIView *showOnView = (UIView *)currentUnit.showOnInstance;
-            [showOnView addSubview:(UIView *)currentUnit.popup];
-            if (CGRectEqualToRect(popupView.frame, CGRectZero)) {
-                popupView.frame = showOnView.bounds;
-            }
-        } else if ([currentUnit.showOnInstance isKindOfClass:[UIViewController class]]) {
-            UIViewController *showOnVC = (UIViewController *)currentUnit.showOnInstance;
-            [showOnVC.view addSubview:(UIView *)currentUnit.popup];
-            if (CGRectEqualToRect(popupView.frame, CGRectZero)) {
-                popupView.frame = showOnVC.view.bounds;
-            }
-        }
-    } else if ([currentUnit.popup isKindOfClass:[UIViewController class]]) {
-        UIViewController *popupVC = (UIViewController *)currentUnit.popup;
-        if ([currentUnit.showOnInstance isKindOfClass:[UIView class]]) {
-            UIView *showOnView = (UIView *)currentUnit.showOnInstance;
-            [showOnView addSubview:popupVC.view];
-            popupVC.view.frame = showOnView.bounds;
-        } else if ([currentUnit.showOnInstance isKindOfClass:[UIViewController class]]) {
-            if (!SCPopupQueueTool.rootNavigationController) {
-                return;
-            }
-            
-            [SCPopupQueueTool.rootNavigationController presentViewController:popupVC animated:YES completion:nil];
-        }
-    }
+    [currentUnit.popup.targetView addSubview:currentUnit.popup];
+    currentUnit.popup.frame = currentUnit.popup.targetView.bounds;
     [currentUnit.popup showPopup];
 }
-
 
 - (void)deleteAllPopupUnits {
     [self.internalUnits enumerateObjectsUsingBlock:^(SCPopupUnit *obj, NSUInteger idx, BOOL * _Nonnull stop) {

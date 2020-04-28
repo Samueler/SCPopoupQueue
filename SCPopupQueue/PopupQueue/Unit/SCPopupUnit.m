@@ -14,13 +14,13 @@
 
 @implementation SCPopupUnit
 
-- (instancetype)initWithPopup:(id<SCPopupProtocol>)popup
+- (instancetype)initWithPopup:(UIView<SCPopupProtocol> *)popup
                 popupPriority:(NSUInteger)popupPriority
                   showOnInstance:(id)showOnInstance {
     return [self initWithPopup:popup popupPriority:popupPriority showOnInstance:showOnInstance async:NO];
 }
 
-- (instancetype)initWithPopup:(id<SCPopupProtocol>)popup
+- (instancetype)initWithPopup:(UIView<SCPopupProtocol> *)popup
                 popupPriority:(NSUInteger)popupPriority
                   showOnInstance:(id)showOnInstance
                         async:(BOOL)async {
@@ -28,14 +28,14 @@
 }
 
 - (instancetype)initWithRequest:(SCPopupRequest *)request
-                          popup:(id<SCPopupProtocol>)popup
+                          popup:(UIView<SCPopupProtocol> *)popup
                   popupPriority:(NSUInteger)popupPriority
                     showOnInstance:(id)showOnInstance {
     return [self initWithRequest:request popup:popup popupPriority:popupPriority showOnInstance:showOnInstance async:NO];
 }
 
 - (instancetype)initWithRequest:(SCPopupRequest *)request
-                          popup:(id<SCPopupProtocol>)popup
+                          popup:(UIView<SCPopupProtocol> *)popup
                   popupPriority:(NSUInteger)popupPriority
                     showOnInstance:(id)showOnInstance
                           async:(BOOL)async {

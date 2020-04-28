@@ -19,23 +19,35 @@ typedef void (^SCPopupAnimationComplete) (BOOL finished);
 
 @property (nonatomic, strong, readonly) UIColor *maskColor;
 
-@property (nonatomic, strong, readonly) UIView *targetView;
++ (instancetype)new NS_UNAVAILABLE;
+- (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initWithTargetView:(UIView *)targetView;
++ (instancetype)popup;
 
-- (instancetype)initWithTargetView:(UIView *)targetView
++ (instancetype)popupWithTargetView:(UIView *)targetView;
+
++ (instancetype)popupWithMaskColor:(UIColor *)maskColor;
+
++ (instancetype)popupWithBounces:(BOOL)bounces;
+
++ (instancetype)popupWithTouchDismiss:(BOOL)touchDismiss;
+
++ (instancetype)popupWithShowComplete:(SCPopupAnimationComplete)showComplete
+                      dismissComplete:(SCPopupAnimationComplete)dismissComplete;
+
++ (instancetype)popupWithTargetView:(UIView *)targetView
                          maskColor:(UIColor *)maskColor;
 
-- (instancetype)initWithTargetView:(UIView *)targetView
++ (instancetype)popupWithTargetView:(UIView *)targetView
                          maskColor:(UIColor *)maskColor
                            bounces:(BOOL)bounces;
 
-- (instancetype)initWithTargetView:(UIView *)targetView
++ (instancetype)popupWithTargetView:(UIView *)targetView
                          maskColor:(UIColor *)maskColor
                            bounces:(BOOL)bounces
                       touchDismiss:(BOOL)touchDismiss;
 
-- (instancetype)initWithTargetView:(UIView *)targetView
++ (instancetype)popupWithTargetView:(UIView *)targetView
                          maskColor:(UIColor *)maskColor
                            bounces:(BOOL)bounces
                       touchDismiss:(BOOL)touchDismiss

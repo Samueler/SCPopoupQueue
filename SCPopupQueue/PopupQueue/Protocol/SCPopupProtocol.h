@@ -17,16 +17,26 @@ typedef NS_ENUM(NSUInteger, SCPopupState) {
 
 @protocol SCPopupProtocol <NSObject>
 
+@property (nonatomic, strong, readonly) UIView *targetView;
+
 @property (nonatomic, assign, readonly) SCPopupState currentState;
 
 @property (nonatomic, copy) void(^popupStateChanged) (SCPopupState state);
+
+@required
 
 - (void)showPopup;
 
 - (void)dismissPopup;
 
+- (CGSize)popupContentSize;
+
 - (UIView *)popupContentView;
 
-- (CGSize)popupContentSize;
+@optional
+
+- (CAAnimation *)popupShowAnimation;
+
+- (CAAnimation *)popupDismissAnimation;
 
 @end
